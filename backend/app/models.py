@@ -80,6 +80,7 @@ class Item(ItemBase, table=True):
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
     owner: User | None = Relationship(back_populates="items")
+    orders: list["Order"] = Relationship(back_populates="item")  # 双方向リレーション
 
 
 # Properties to return via API, id is always required
@@ -112,3 +113,11 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)
+
+
+# Orderクラスを更新
+class Order(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    item_id: uuid.UUID = Field(foreign_key="item.id", nullable=False)
+    quantity: int = Field(default=1, ge=1)  # 最小値を1に設定
+    item: Item | None = Relationship(back_populates="orders")  # 双方向リレーション
