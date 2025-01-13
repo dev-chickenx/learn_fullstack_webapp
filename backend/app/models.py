@@ -1,20 +1,35 @@
 import uuid
+from typing import List, Optional
 
 from pydantic import EmailStr
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Column, Field, ForeignKey, Relationship, SQLModel, String, Table
+
+# Association table for many-to-many relationship between User and Role
+user_roles = Table(
+    "user_roles",
+    SQLModel.metadata,
+    Column("user_id", uuid.UUID, ForeignKey("user.id"), primary_key=True),
+    Column("role_id", uuid.UUID, ForeignKey("role.id"), primary_key=True),
+)
 
 
-# Shared properties
+class Role(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(sa_column=Column("name", String, unique=True, index=True))
+    description: Optional[str] = None
+
+
 class UserBase(SQLModel):
     email: EmailStr = Field(unique=True, index=True, max_length=255)
     is_active: bool = True
-    is_superuser: bool = False
+    roles: List[Role] = Relationship(back_populates="users", link_model=user_roles)
     full_name: str | None = Field(default=None, max_length=255)
 
 
-# Properties to receive via API on creation
+# Properties to receive via API on creation, including roles
 class UserCreate(UserBase):
     password: str = Field(min_length=8, max_length=40)
+    roles: List[uuid.UUID] = []
 
 
 class UserRegister(SQLModel):
@@ -23,10 +38,11 @@ class UserRegister(SQLModel):
     full_name: str | None = Field(default=None, max_length=255)
 
 
-# Properties to receive via API on update, all are optional
+# Properties to receive via API on update, all are optional, including roles
 class UserUpdate(UserBase):
     email: EmailStr | None = Field(default=None, max_length=255)  # type: ignore
     password: str | None = Field(default=None, min_length=8, max_length=40)
+    roles: List[uuid.UUID] = []
 
 
 class UserUpdateMe(SQLModel):
@@ -43,10 +59,12 @@ class UpdatePassword(SQLModel):
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
-    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    items: List["Item"] = Relationship(back_populates="owner", cascade_delete=True)
 
 
-# Properties to return via API, id is always required
+Role.users = Relationship(back_populates="roles", link_model=user_roles)
+
+
 class UserPublic(UserBase):
     id: uuid.UUID
 

@@ -12,7 +12,7 @@ from app.api.deps import (
 )
 from app.core.config import settings
 from app.core.security import get_password_hash, verify_password
-from app.models import (
+from app.models import Role
     Item,
     Message,
     UpdatePassword,
@@ -62,7 +62,9 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
             detail="The user with this email already exists in the system.",
         )
 
+    roles = session.exec(select(Role).where(Role.id.in_(user_in.roles))).all()
     user = crud.create_user(session=session, user_create=user_in)
+    user.roles = roles
     if settings.emails_enabled and user_in.email:
         email_data = generate_new_account_email(
             email_to=user_in.email, username=user_in.email, password=user_in.password
@@ -203,7 +205,9 @@ def update_user(
                 status_code=409, detail="User with this email already exists"
             )
 
+    roles = session.exec(select(Role).where(Role.id.in_(user_in.roles))).all()
     db_user = crud.update_user(session=session, db_user=db_user, user_in=user_in)
+    db_user.roles = roles
     return db_user
 
 
