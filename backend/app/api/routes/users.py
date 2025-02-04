@@ -1,5 +1,5 @@
 import uuid
-from typing import Any
+from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import col, delete, func, select
@@ -12,9 +12,10 @@ from app.api.deps import (
 )
 from app.core.config import settings
 from app.core.security import get_password_hash, verify_password
-from app.models import Role
+from app.models import (
     Item,
     Message,
+    Role,
     UpdatePassword,
     User,
     UserCreate,
@@ -155,6 +156,12 @@ def register_user(session: SessionDep, user_in: UserRegister) -> Any:
             detail="The user with this email already exists in the system",
         )
     user_create = UserCreate.model_validate(user_in)
+
+    # デフォルトロールの取得
+    default_role = session.exec(select(Role).where(Role.name == "user")).first()
+    if default_role:
+        user_create.roles = [default_role.id]
+
     user = crud.create_user(session=session, user_create=user_create)
     return user
 
