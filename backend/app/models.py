@@ -1,6 +1,7 @@
 import uuid
+from enum import Enum
 
-from pydantic import EmailStr
+from pydantic import EmailStr, constr
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -112,3 +113,67 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)
+
+
+# Product reference type enum
+class ReferenceType(str, Enum):
+    REGULAR = "R"
+    TEMPORARY = "T"
+    YOYAKU = "Y"
+
+
+# Shared properties for Product
+class ProductBase(SQLModel):
+    reference_type: ReferenceType
+    item_code: str = Field(
+        max_length=8,
+        min_length=8,
+        regex="^[0-9A-Za-z]{8}$"
+    )
+    name: str = Field(max_length=255)
+    price: float = Field(ge=0, default=0.00)
+    stock_quantity: int = Field(ge=0, default=0)
+    category: str = Field(max_length=100)
+    status: str = Field(
+        max_length=20,
+        default="active"
+    )
+    weight_grams: int | None = Field(default=None, ge=0)
+
+
+# Properties to receive on product creation
+class ProductCreate(ProductBase):
+    pass
+
+
+# Properties to receive on product update
+class ProductUpdate(SQLModel):
+    name: str | None = Field(default=None, max_length=255)
+    price: float | None = Field(default=None, ge=0)
+    stock_quantity: int | None = Field(default=None, ge=0)
+    category: str | None = Field(default=None, max_length=100)
+    status: str | None = Field(default=None, max_length=20)
+    weight_grams: int | None = Field(default=None, ge=0)
+
+
+# Database model
+class Product(ProductBase, table=True):
+    __table_args__ = (
+        {'schema': 'public', 'comment': 'システムで取り扱う商品の基本情報を管理するテーブル'},
+    )
+
+    # Primary key is composite of reference_type and item_code
+    reference_type: ReferenceType = Field(primary_key=True)
+    item_code: str = Field(primary_key=True)
+
+
+# Properties to return via API
+class ProductPublic(ProductBase):
+    pass
+
+
+# List of products to return via API
+class ProductsPublic(SQLModel):
+    data: list[ProductPublic]
+    count: int
+
