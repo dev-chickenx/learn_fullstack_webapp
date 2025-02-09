@@ -28,7 +28,7 @@ services:
     depends_on:
       - db
     environment:
-      - ADMINER_DESIGN=pepa-linha-dark
+      - ADMINER_DESIGN=flat
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-public
