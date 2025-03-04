@@ -11,6 +11,7 @@ interface Section2Props {
 
 const Section2 = ({ onSelect, currentData }: Section2Props) => {
     // テーブルのデータを管理
+    console.log("Section2 Rendered")
     const table1Data: PersonData[] = [
         {
             id: 1,

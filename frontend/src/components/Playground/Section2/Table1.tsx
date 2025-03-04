@@ -21,6 +21,7 @@ interface Table1Props {
 }
 
 const Table1 = ({ onSelect, selectedRows, data }: Table1Props) => {
+    console.log("Table1 Rendered")
     return (
         <DataTable
             data={data}

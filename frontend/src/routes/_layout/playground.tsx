@@ -4,6 +4,7 @@ import { useState } from "react"
 
 import Section1 from "../../components/Playground/Section1/Table"
 import Section2 from "../../components/Playground/Section2/Tab"
+import Section3 from "../../components/Playground/Section3/Select"
 import type { PersonData } from "../../types/table"
 
 export const Route = createFileRoute("/_layout/playground")({
@@ -26,6 +27,13 @@ function Playground() {
 
       <Box mb={8}>
         <Section2
+          onSelect={setSelectedData}
+          currentData={selectedData}
+        />
+      </Box>
+
+      <Box mb={8}>
+        <Section3
           onSelect={setSelectedData}
           currentData={selectedData}
         />
