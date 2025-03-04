@@ -5,6 +5,9 @@ import type { PersonData } from "../../../types/table"
 const columnHelper = createColumnHelper<PersonData>()
 
 const columns = [
+    columnHelper.accessor("id", { header: "ID" }),
+    columnHelper.accessor("name", { header: "Name" }),
+    columnHelper.accessor("address", { header: "Address" }),
     columnHelper.accessor("tel", { header: "Tel" }),
     columnHelper.accessor("job", { header: "Job" }),
 ]
