@@ -9,16 +9,15 @@ import {
 import { useState } from "react"
 import type { PersonData } from "../../types/table"
 
-interface DataTableProps {
-    data: PersonData[]
-    columns: ColumnDef<PersonData, any>[]
-    onSelect?: (data: PersonData[]) => void
+interface DataTableProps<T> {
+    data: T[]
+    columns: ColumnDef<T, any>[]
+    onSelect: (data: T[]) => void
     showTransferButton?: boolean
+    selectedRows?: T[]
 }
 
-const DataTable = ({ data, columns, onSelect, showTransferButton = false }: DataTableProps) => {
-    const [selectedRows, setSelectedRows] = useState<PersonData[]>([])
-
+const DataTable = ({ data, columns, onSelect, showTransferButton = false, selectedRows = [] }: DataTableProps<PersonData>) => {
     const table = useReactTable({
         data,
         columns,
@@ -27,17 +26,15 @@ const DataTable = ({ data, columns, onSelect, showTransferButton = false }: Data
 
     const handleRowClick = (row: PersonData) => {
         if (!onSelect) return
-        setSelectedRows(prev =>
-            prev.find(r => r.id === row.id)
-                ? prev.filter(r => r.id !== row.id)
-                : [...prev, row]
-        )
+        const newSelection = selectedRows.find(r => r.id === row.id)
+            ? selectedRows.filter(r => r.id !== row.id)
+            : [...selectedRows, row]
+        onSelect(newSelection)
     }
 
     const handleTransfer = () => {
         if (onSelect) {
             onSelect(selectedRows)
-            setSelectedRows([])
         }
     }
 

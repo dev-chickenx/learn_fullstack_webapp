@@ -12,34 +12,19 @@ const columns = [
     columnHelper.accessor("job", { header: "Job" }),
 ]
 
-const defaultData: PersonData[] = [
-    {
-        id: 3,
-        name: "Bob Johnson",
-        address: "Kyoto",
-        tel: "070-1234-5678",
-        job: "Manager",
-    },
-    {
-        id: 4,
-        name: "Alice Brown",
-        address: "Nagoya",
-        tel: "060-1234-5678",
-        job: "Designer",
-    },
-]
-
 interface Table2Props {
     onSelect: (data: PersonData[]) => void
+    selectedRows: PersonData[]
+    data: PersonData[]
 }
 
-const Table2 = ({ onSelect }: Table2Props) => {
+const Table2 = ({ onSelect, selectedRows, data }: Table2Props) => {
     return (
         <DataTable
-            data={defaultData}
+            data={data}
             columns={columns}
             onSelect={onSelect}
-            showTransferButton
+            selectedRows={selectedRows}
         />
     )
 }

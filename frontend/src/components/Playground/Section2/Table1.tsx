@@ -2,6 +2,7 @@ import { Box } from "@chakra-ui/react"
 import { createColumnHelper } from "@tanstack/react-table"
 import DataTable from "../../Common/DataTable"
 import type { PersonData } from "../../../types/table"
+import { useState } from "react"
 
 const columnHelper = createColumnHelper<PersonData>()
 
@@ -13,34 +14,19 @@ const columns = [
     columnHelper.accessor("job", { header: "Job" }),
 ]
 
-const defaultData: PersonData[] = [
-    {
-        id: 1,
-        name: "Jane Smith",
-        address: "Osaka",
-        tel: "080-1234-5678",
-        job: "Designer",
-    },
-    {
-        id: 2,
-        name: "John Doe",
-        address: "Tokyo",
-        tel: "090-1234-5678",
-        job: "Engineer",
-    },
-]
-
 interface Table1Props {
     onSelect: (data: PersonData[]) => void
+    selectedRows: PersonData[]
+    data: PersonData[]
 }
 
-const Table1 = ({ onSelect }: Table1Props) => {
+const Table1 = ({ onSelect, selectedRows, data }: Table1Props) => {
     return (
         <DataTable
-            data={defaultData}
+            data={data}
             columns={columns}
             onSelect={onSelect}
-            showTransferButton
+            selectedRows={selectedRows}
         />
     )
 }

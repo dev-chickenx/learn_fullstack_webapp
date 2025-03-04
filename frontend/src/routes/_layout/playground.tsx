@@ -25,7 +25,10 @@ function Playground() {
       </Box>
 
       <Box mb={8}>
-        <Section2 onSelect={setSelectedData} />
+        <Section2
+          onSelect={setSelectedData}
+          currentData={selectedData}
+        />
       </Box>
     </Container>
   )
