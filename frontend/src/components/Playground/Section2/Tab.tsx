@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, memo, useCallback } from "react"
 import { Box, Button, Heading, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react"
 import Table1 from "./Table1"
 import Table2 from "./Table2"
@@ -9,9 +9,10 @@ interface Section2Props {
     currentData: PersonData[]
 }
 
-const Section2 = ({ onSelect, currentData }: Section2Props) => {
+const Section2 = memo(({ onSelect, currentData }: Section2Props) => {
+    console.log("Section2 Render", { currentData })  // レンダリングの追跡
+
     // テーブルのデータを管理
-    console.log("Section2 Rendered")
     const table1Data: PersonData[] = [
         {
             id: 1,
@@ -57,11 +58,8 @@ const Section2 = ({ onSelect, currentData }: Section2Props) => {
         }
     }
 
-    const handleTransfer = () => {
-        // 両方のテーブルの選択をマージ
+    const handleTransfer = useCallback(() => {
         const allSelections = [...table1Selection, ...table2Selection]
-
-        // 現在のデータと新しい選択を結合し、重複を除去
         const combinedData = [...currentData, ...allSelections]
         const uniqueSelections = combinedData.reduce((acc, current) => {
             const exists = acc.find(item => item.id === current.id)
@@ -71,9 +69,8 @@ const Section2 = ({ onSelect, currentData }: Section2Props) => {
             return acc
         }, [] as PersonData[])
 
-        // 累積データを親コンポーネントに渡す
         onSelect(uniqueSelections)
-    }
+    }, [table1Selection, table2Selection, currentData, onSelect])
 
     return (
         <Box>
@@ -113,6 +110,6 @@ const Section2 = ({ onSelect, currentData }: Section2Props) => {
             </Box>
         </Box>
     )
-}
+})
 
 export default Section2

@@ -1,6 +1,6 @@
 import { Box, Container, Heading, Text } from "@chakra-ui/react"
 import { createFileRoute } from "@tanstack/react-router"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 
 import Section1 from "../../components/Playground/Section1/Table"
 import Section2 from "../../components/Playground/Section2/Tab"
@@ -13,6 +13,10 @@ export const Route = createFileRoute("/_layout/playground")({
 
 function Playground() {
   const [selectedData, setSelectedData] = useState<PersonData[]>([])
+
+  const handleDataUpdate = useCallback((newData: PersonData[]) => {
+    setSelectedData(newData)
+  }, [])
 
   return (
     <Container maxW="full">
@@ -27,7 +31,7 @@ function Playground() {
 
       <Box mb={8}>
         <Section2
-          onSelect={setSelectedData}
+          onSelect={handleDataUpdate}
           currentData={selectedData}
         />
       </Box>
