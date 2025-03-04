@@ -18,6 +18,13 @@ function Playground() {
     setSelectedData(newData)
   }, [])
 
+  const Section2Component = () => (
+    <Section2
+      onSelect={handleDataUpdate}
+      currentData={selectedData}
+    />
+  )
+
   return (
     <Container maxW="full">
       <Heading as="h1" size="lg" mb={4}>
@@ -30,10 +37,7 @@ function Playground() {
       </Box>
 
       <Box mb={8}>
-        <Section2
-          onSelect={handleDataUpdate}
-          currentData={selectedData}
-        />
+        <Section2Component />
       </Box>
 
       <Box mb={8}>
