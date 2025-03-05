@@ -1,5 +1,5 @@
-import { useState, memo, useCallback } from "react"
-import { Box, Button, Heading, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react"
+import { useState, memo } from "react"
+import { Box, Heading, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react"
 import Table1 from "./Table1"
 import Table2 from "./Table2"
 import type { PersonData } from "../../../types/table"
@@ -56,21 +56,12 @@ const Section2 = memo(({ onSelect, currentData }: Section2Props) => {
     } else {
       setTable2Selection(tableData)
     }
+    // 両方のテーブルの選択を親コンポーネントに通知
+    const allSelections = isTable1
+      ? [...tableData, ...table2Selection]
+      : [...table1Selection, ...tableData]
+    onSelect(allSelections)
   }
-
-  const handleTransfer = useCallback(() => {
-    const allSelections = [...table1Selection, ...table2Selection]
-    const combinedData = [...currentData, ...allSelections]
-    const uniqueSelections = combinedData.reduce((acc, current) => {
-      const exists = acc.find((item) => item.id === current.id)
-      if (!exists) {
-        acc.push(current)
-      }
-      return acc
-    }, [] as PersonData[])
-
-    onSelect(uniqueSelections)
-  }, [table1Selection, table2Selection, currentData, onSelect])
 
   return (
     <Box>
@@ -100,15 +91,6 @@ const Section2 = memo(({ onSelect, currentData }: Section2Props) => {
             </TabPanel>
           </TabPanels>
         </Tabs>
-        <Box mt={4}>
-          <Button
-            colorScheme="blue"
-            onClick={handleTransfer}
-            isDisabled={table1Selection.length === 0 && table2Selection.length === 0}
-          >
-            Transfer Selected ({table1Selection.length + table2Selection.length})
-          </Button>
-        </Box>
       </Box>
     </Box>
   )
