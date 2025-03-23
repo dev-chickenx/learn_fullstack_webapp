@@ -153,5 +153,3 @@ docker compose -f docker-compose.yml up -d
 - Traefik管理画面: `http://traefik.test-app.internal`
 
 ホスト名を解決するために、社内DNSに登録するか、一時的にhostsファイルに追加する必要があります。
-
-##
