@@ -36,10 +36,11 @@ ENV PYTHONPATH=/app
 COPY ./scripts /app/scripts
 COPY ./app/cron/crontab /etc/cron.d/app-cron
 
-# Set permissions for cron job
+# Set permissions for cron job and scripts
 RUN chmod 0644 /etc/cron.d/app-cron && \
     touch /var/log/cron.log && \
-    chmod 666 /var/log/cron.log
+    chmod 666 /var/log/cron.log && \
+    chmod +x /app/scripts/run_cron.sh
 
 COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
 
