@@ -4,6 +4,10 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app/
 
+# Install cron
+RUN apt-get update && apt-get install -y cron && \
+    rm -rf /var/lib/apt/lists/*
+
 # Install uv
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#installing-uv
 COPY --from=ghcr.io/astral-sh/uv:0.4.15 /uv /bin/uv
@@ -30,6 +34,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 ENV PYTHONPATH=/app
 
 COPY ./scripts /app/scripts
+COPY ./app/cron/crontab /etc/cron.d/app-cron
+
+# Set permissions for cron job
+RUN chmod 0644 /etc/cron.d/app-cron && \
+    touch /var/log/cron.log && \
+    chmod 666 /var/log/cron.log
 
 COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
 
@@ -40,4 +50,8 @@ COPY ./app /app/app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
-CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+# Create startup script
+COPY ./scripts/start.sh /app/scripts/start.sh
+RUN chmod +x /app/scripts/start.sh
+
+CMD ["/app/scripts/start.sh"]

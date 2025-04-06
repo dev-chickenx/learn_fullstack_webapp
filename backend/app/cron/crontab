@@ -1,0 +1,5 @@
+# 検証用：3分おきに実行
+*/3 * * * * /app/scripts/run_cron.sh >> /var/log/cron.log 2>&1
+
+# 本番用：平日のJST7時に実行（コメントアウト）
+# 0 7 * * 1-5 /app/scripts/run_cron.sh >> /var/log/cron.log 2>&1
